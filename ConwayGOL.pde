@@ -1,11 +1,13 @@
 import java.util.Random;
 
-static final int BACKGROUND = 0;      //BG Color
-static final int CELL_SIZE = 10;      //Size of cells in pixels
-static final int NUM_CELL_X = 100;    //How many cellels we want in x direction
-static final int NUM_CELL_Y = 100;    //       '          '        y   ' '
-static final int UPDATE_DEL = 20;     //Update delay
+static final int BACKGROUND = 0;        //BG Color
+static final int CELL_SIZE = 10;        //Size of cells in pixels
+static final int NUM_CELL_X = 100;      //How many cell we want in x direction
+static final int NUM_CELL_Y = 100;      //       '          '        y   ' '
+static final Boolean WRAP_EDGES = true; //Toggle edge wrapping
 int brushSize = 1;                    //Brush size
+int updateDelay = 10;       //Update delay in ms
+
 int cellMatrix[][] = new int[NUM_CELL_X][NUM_CELL_Y];    //Make the matrix that will store our cell values
 
 Boolean drawMode = false;
@@ -47,7 +49,24 @@ void writecell(int[][] matrix, int x, int y, float val) {
     matrix[x][y] = cellVal;
 }
 
-void update() {
+int neighborCount(int x, int y) {
+  int count = 0;
+  for (int i = (WRAP_EDGES? -1 : (x>0 ? -1 : 0)); i <= (WRAP_EDGES? 1 : (x<NUM_CELL_X-1 ? 1 : 0)); i++) {
+    for (int j = (WRAP_EDGES? -1 : (y>0 ? -1 : 0)); j <= (WRAP_EDGES? 1 : (y<NUM_CELL_Y-1 ? 1 : 0)); j++) {
+      if (i != 0 || j != 0) {
+        int a,b;
+        if ((i+x)<0) a = NUM_CELL_X-1; else if ((i+x)>=NUM_CELL_X) a = 0; else a = (i+x);
+        if ((j+y)<0) b = NUM_CELL_Y-1; else if ((j+y)>=NUM_CELL_X) b = 0; else b = (j+y);
+        if (cellMatrix[(a)][(b)] > 0){
+          count++; 
+        }
+      }
+    }
+  }
+  return count;
+}
+
+void updateState() {
   //We need to copy cellMatrix into a new array so that we can update vaules all at once
   int[][] cellMatrix2 = new int[NUM_CELL_X][NUM_CELL_Y];
   for (int i = 0; i < NUM_CELL_X; i++) {
@@ -58,17 +77,9 @@ void update() {
   //Iterate through each cellel
   for (int x = 0; x < NUM_CELL_X; x++) {
     for (int y = 0; y < NUM_CELL_Y; y++) {
-      int countLiveAdj = 0;
       //Check cellels directly around the one we're focused on to count it's live neighbors
-      for (int i = (x>0 ? -1 : 0); i <= (x<NUM_CELL_X-1 ? 1 : 0); i++) {
-        for (int j = (y>0 ? -1 : 0); j <= (y<NUM_CELL_Y-1 ? 1 : 0); j++) {
-          if (i != 0 || j != 0) {
-            if (cellMatrix[i+x][j+y] > 0){
-              countLiveAdj++; 
-            }
-          }
-        }
-      }
+      int countLiveAdj = neighborCount(x,y);
+      
       //===============================
       //RULES FOR CONWAY'S GAME OF LIFE
       if (countLiveAdj < 2 || countLiveAdj > 3) {
@@ -77,6 +88,7 @@ void update() {
         writecell(cellMatrix2, x, y, 1); 
       }
       //===============================
+      
     }
   }
   //This is where we update all the values at once
@@ -93,15 +105,23 @@ void mouseReleased() {
 
 //Code for pausing and changing brush size
 void keyPressed() {
-  if (key == ' '){
+  if (key == ' ')
     paused = !paused; 
-  }
-  if (key == '[' && brushSize > 1) {
+  
+  if (key == '[' && brushSize > 1) 
     brushSize--; 
-  } 
-  if (key == ']' && brushSize < 50) {
+  
+  if (key == ']' && brushSize < 50) 
     brushSize++; 
-  }
+  
+  if (key == 'x') 
+    fillMat(cellMatrix, 0); 
+ 
+  if (key == 's')
+    updateDelay+=10;
+
+  if (key == 'f' && updateDelay > 10)
+    updateDelay-=10;
 }
 
 //Main Loop
@@ -127,7 +147,7 @@ void draw() {
   } 
   //Update if not paused
   if (!paused) {
-     update();
-     delay(UPDATE_DEL);
+     updateState();
+     delay(updateDelay);
   }
 }
