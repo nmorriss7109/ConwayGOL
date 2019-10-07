@@ -2,8 +2,8 @@ import java.util.Random;
 
 static final int BACKGROUND = 0;        //BG Color
 static final int CELL_SIZE = 10;        //Size of cells in pixels
-static final int NUM_CELL_X = 100;      //How many cell we want in x direction
-static final int NUM_CELL_Y = 100;      //       '          '        y   ' '
+static final int NUM_CELL_X = 120;      //How many cell we want in x direction
+static final int NUM_CELL_Y = 90;      //       '          '        y   ' '
 static final Boolean WRAP_EDGES = true; //Toggle edge wrapping
 int brushSize = 1;                    //Brush size
 int updateDelay = 10;       //Update delay in ms
@@ -56,8 +56,8 @@ int neighborCount(int x, int y) {
       if (i != 0 || j != 0) {
         int a,b;
         if ((i+x)<0) a = NUM_CELL_X-1; else if ((i+x)>=NUM_CELL_X) a = 0; else a = (i+x);
-        if ((j+y)<0) b = NUM_CELL_Y-1; else if ((j+y)>=NUM_CELL_X) b = 0; else b = (j+y);
-        if (cellMatrix[(a)][(b)] > 0){
+        if ((j+y)<0) b = NUM_CELL_Y-1; else if ((j+y)>=NUM_CELL_Y) b = 0; else b = (j+y);
+        if (cellMatrix[a][b] > 0){
           count++; 
         }
       }
