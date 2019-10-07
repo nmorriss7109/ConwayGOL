@@ -1,5 +1,5 @@
 # ConwayGOL
-Conway's Game of Life in processing!
+Conway's Game of Life in Processing!
 - Use SPACE to pause/play
 - Click mouse to draw
 - Square brackets to change brush size
